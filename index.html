@@ -2590,7 +2590,6 @@
   }
 
 </script>
-  
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
@@ -2600,26 +2599,31 @@ const supabase = window.supabase.createClient(
 );
 
 async function submitHomeLead() {
-  const nombre = document.getElementById("hlNombre").value.trim();
-  const telefono = document.getElementById("hlCelular").value.trim();
-  const email = document.getElementById("hlCorreo").value.trim();
+  const nombre = document.getElementById("hlNombre")?.value.trim();
+  const telefono = document.getElementById("hlCelular")?.value.trim();
+  const email = document.getElementById("hlCorreo")?.value.trim();
+  const ok = document.getElementById("hlok");
+
+  console.log("Datos enviados:", { nombre, telefono, email });
 
   if (!nombre || !telefono || !email) {
     alert("Por favor completa todos los campos");
     return;
   }
 
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from("leads")
-    .insert([{ nombre, telefono, email }]);
+    .insert([{ nombre, telefono, email }])
+    .select();
+
+  console.log("Respuesta Supabase:", { data, error });
 
   if (error) {
-    console.error("Error Supabase:", error);
-    alert("Error al enviar. Intenta nuevamente.");
+    alert("Error: " + error.message);
     return;
   }
 
-  document.getElementById("hlok").style.display = "block";
+  if (ok) ok.style.display = "block";
 
   document.getElementById("hlNombre").value = "";
   document.getElementById("hlCelular").value = "";
