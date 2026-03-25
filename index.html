@@ -2590,5 +2590,41 @@
   }
 
 </script>
+  
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+const supabase = window.supabase.createClient(
+  "https://uiyaknuovssiglkhnccd.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVpeWFrbnVvdnNzaWdsa2huY2NkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0MTE5NTYsImV4cCI6MjA4OTk4Nzk1Nn0.HvbVToEEpRqEjVu43sKhb2j0R_5t8ySAfRXmWY1Cq_Y"
+);
+
+async function submitHomeLead() {
+  const nombre = document.getElementById("hlNombre").value.trim();
+  const telefono = document.getElementById("hlCelular").value.trim();
+  const email = document.getElementById("hlCorreo").value.trim();
+
+  if (!nombre || !telefono || !email) {
+    alert("Por favor completa todos los campos");
+    return;
+  }
+
+  const { error } = await supabase
+    .from("leads")
+    .insert([{ nombre, telefono, email }]);
+
+  if (error) {
+    console.error("Error Supabase:", error);
+    alert("Error al enviar. Intenta nuevamente.");
+    return;
+  }
+
+  document.getElementById("hlok").style.display = "block";
+
+  document.getElementById("hlNombre").value = "";
+  document.getElementById("hlCelular").value = "";
+  document.getElementById("hlCorreo").value = "";
+}
+</script>
 </body>
 </html>
