@@ -2220,5 +2220,56 @@ function showToast(msg, type='info') {
   });
 
 </script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+const supabaseClient = window.supabase.createClient(
+  "https://uiyaknuovssiglkhnccd.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVpeWFrbnVvdnNzaWdsa2huY2NkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0MTE5NTYsImV4cCI6MjA4OTk4Nzk1Nn0.HvbVToEEpRqEjVu43sKhb2j0R_5t8ySAfRXmWY1Cq_Y"
+);
+</script>
+  <script>
+async function cargarLeads() {
+  const { data, error } = await supabaseClient
+    .from("leads")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Error cargando leads:", error);
+    return;
+  }
+
+  console.log("Leads:", data);
+
+  renderLeads(data);
+}
+</script>
+  <script>
+function renderLeads(leads) {
+  const tbody = document.querySelector("table tbody");
+
+  tbody.innerHTML = "";
+
+  leads.forEach(lead => {
+    const row = `
+      <tr>
+        <td>${lead.nombre}</td>
+        <td>${lead.email}</td>
+        <td>${lead.telefono}</td>
+        <td>-</td>
+        <td>${new Date(lead.created_at).toLocaleString()}</td>
+        <td>Nuevo</td>
+        <td>-</td>
+      </tr>
+    `;
+    tbody.innerHTML += row;
+  });
+}
+</script>
+  <script>
+document.addEventListener("DOMContentLoaded", cargarLeads);
+</script>
+  
 </body>
 </html>
