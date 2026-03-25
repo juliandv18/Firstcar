@@ -2144,8 +2144,7 @@ function showToast(msg, type='info') {
   // ══════════════════════════════════════════════════
   //  LEADS
   // ══════════════════════════════════════════════════
-<script> 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
   const supabaseClient = window.supabase.createClient(
     "https://uiyaknuovssiglkhnccd.supabase.co",
@@ -2181,15 +2180,8 @@ function showToast(msg, type='info') {
       return;
     }
 
-    const estadoColors = {
-      nuevo: 'badge-red',
-      contactado: 'badge-amber',
-      cerrado: 'badge-green'
-    };
-
     tbody.innerHTML = list.map(function(l) {
       const estado = l.estado || 'nuevo';
-      const col = estadoColors[estado] || 'badge-blue';
 
       return '<tr>'
         + '<td><strong>' + (l.nombre || '—') + '</strong></td>'
@@ -2197,14 +2189,8 @@ function showToast(msg, type='info') {
         + '<td>' + (l.telefono || '—') + '</td>'
         + '<td style="max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + (l.asunto || '—') + '</td>'
         + '<td style="color:var(--text2)">' + (l.created_at ? new Date(l.created_at).toLocaleString() : '—') + '</td>'
-        + '<td><select class="form-select" style="padding:4px 8px;font-size:12px" onchange="changeLeadStatus(' + l.id + ', this.value)">'
-          + ['nuevo','contactado','cerrado'].map(function(s){
-              return '<option value="' + s + '"' + (estado === s ? ' selected' : '') + '>'
-                + s.charAt(0).toUpperCase() + s.slice(1)
-                + '</option>';
-            }).join('')
-        + '</select></td>'
-        + '<td><button class="btn btn-danger btn-sm btn-icon" onclick="deleteLead(' + l.id + ')" title="Eliminar">🗑️</button></td>'
+        + '<td>' + estado + '</td>'
+        + '<td>-</td>'
         + '</tr>';
     }).join('');
   }
@@ -2221,47 +2207,10 @@ function showToast(msg, type='info') {
         (l.telefono || '').includes(q);
 
       const matchE = !estado || (l.estado || 'nuevo') === estado;
-
       return matchQ && matchE;
     });
 
     renderLeadsTable(filtered);
-  }
-
-  async function changeLeadStatus(id, newStatus) {
-    const { error } = await supabaseClient
-      .from("leads")
-      .update({ estado: newStatus })
-      .eq("id", id);
-
-    if (error) {
-      console.error("Error actualizando estado:", error);
-      return;
-    }
-
-    await cargarLeads();
-    if (typeof showToast === 'function') {
-      showToast('Estado actualizado', 'success');
-    }
-  }
-
-  async function deleteLead(id) {
-    if (!confirm('¿Eliminar este lead?')) return;
-
-    const { error } = await supabaseClient
-      .from("leads")
-      .delete()
-      .eq("id", id);
-
-    if (error) {
-      console.error("Error eliminando lead:", error);
-      return;
-    }
-
-    await cargarLeads();
-    if (typeof showToast === 'function') {
-      showToast('Lead eliminado', 'error');
-    }
   }
 
   async function clearAllLeads() {
@@ -2274,17 +2223,15 @@ function showToast(msg, type='info') {
 
     if (error) {
       console.error("Error eliminando leads:", error);
-      alert("No se pudieron eliminar los leads");
       return;
     }
 
     await cargarLeads();
-    if (typeof showToast === 'function') {
-      showToast('Todos los leads eliminados', 'error');
-    }
   }
 
-  document.addEventListener("DOMContentLoaded", cargarLeads);
+  document.addEventListener("DOMContentLoaded", function () {
+    cargarLeads();
+  });
 </script>
   
 </body>
