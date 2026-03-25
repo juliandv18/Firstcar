@@ -1449,23 +1449,28 @@
         <div class="home-lead-title">Déjanos tus datos y<br>un asesor te <em>contacta</em></div>
         <div class="home-lead-sub">Sin compromiso — te orientamos gratis en minutos</div>
       </div>
-      <div class="home-lead-form">
-        <div class="home-lead-field">
-          <label class="home-lead-label">Nombre</label>
-          <input class="home-lead-input" id="hlNombre" type="text" placeholder="Tu nombre completo">
-        </div>
-        <div class="home-lead-field">
-          <label class="home-lead-label">Celular / WhatsApp</label>
-          <input class="home-lead-input" id="hlCelular" type="tel" placeholder="+57 300 000 0000">
-        </div>
-        <div class="home-lead-field">
-          <label class="home-lead-label">Correo electrónico</label>
-          <input class="home-lead-input" id="hlCorreo" type="email" placeholder="tu@email.com">
-        </div>
-        <button class="home-lead-btn" onclick="submitHomeLead()">Quiero asesoría →</button>
-      </div>
-      <div class="home-lead-ok" id="hlOk">✅ ¡Recibido! Un asesor te contactará muy pronto.</div>
-    </div>
+    <div class="home-lead-form">
+  <div class="home-lead-field">
+    <label class="home-lead-label">Nombre</label>
+    <input class="home-lead-input" id="hlNombre" type="text" placeholder="Tu nombre completo">
+  </div>
+
+  <div class="home-lead-field">
+    <label class="home-lead-label">Celular / WhatsApp</label>
+    <input class="home-lead-input" id="hlCelular" type="tel" placeholder="+57 300 000 0000">
+  </div>
+
+  <div class="home-lead-field">
+    <label class="home-lead-label">Correo electrónico</label>
+    <input class="home-lead-input" id="hlCorreo" type="email" placeholder="tu@email.com">
+  </div>
+
+  <button type="button" class="home-lead-btn" onclick="submitHomeLead()">Quiero asesoría →</button>
+</div>
+
+<div class="home-lead-ok" id="hlok" style="display:none;">
+  ✅ ¡Recibido! Un asesor te contactará muy pronto.
+</div>
   </section>
 
   <!-- Featured Cars — dinámico desde dashboard -->
