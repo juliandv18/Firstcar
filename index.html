@@ -501,12 +501,12 @@
     width: 100%;
     height: 100%;
     object-fit: contain;
-    filter: grayscale(100%);
-    opacity: 0.75;
+    filter: grayscale(100%) brightness(0.3);
+    opacity: 0.65;
     transition: filter .3s, opacity .3s;
   }
   .brand-card-new:hover .brand-logo-new img {
-    filter: grayscale(0%);
+    filter: grayscale(0%) brightness(1);
     opacity: 1;
   }
   .brand-logo-new svg {
@@ -807,7 +807,7 @@
     .hamburger { display: flex; }
 
     /* Hero */
-    .hero { padding: 80px 20px 48px; min-height: 80vh; }
+    .hero { padding: 80px 20px 48px; min-height: auto; }
     .hero h1 { font-size: clamp(38px, 10vw, 72px); }
     .hero p { font-size: 16px; }
     .hero-stats { gap: 24px; flex-wrap: wrap; }
@@ -870,7 +870,7 @@
     .btn-login { padding: 7px 14px; font-size: 12px; }
 
     /* Hero */
-    .hero { padding: 76px 16px 40px; min-height: 100svh; }
+    .hero { padding: 76px 16px 40px; min-height: auto; }
     .hero h1 { font-size: clamp(36px, 11vw, 56px); letter-spacing: -1px; }
     .hero p { font-size: 15px; max-width: 100%; }
     .hero-actions { flex-direction: column; gap: 12px; }
@@ -952,6 +952,59 @@
     .search-section { margin: 0 8px; padding: 16px 12px; }
     .types-grid { grid-template-columns: repeat(2, 1fr); }
     .modal { padding: 24px 16px; }
+    .search-card { padding: 20px 16px 18px; }
+    .sf-group { padding: 8px 12px; }
+    .price-label-row span { font-size: 13px; }
+    .currency-btn { padding: 2px 7px; font-size: 10px; }
+  }
+
+  /* ── Hero search card – Tablet Portrait (max 900px) ── */
+  @media (max-width: 900px) {
+    .hero-content {
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: flex-start;
+      padding: 0 20px;
+      padding-top: 20px;
+      min-height: auto;
+      padding-bottom: 48px;
+    }
+    .hero-left {
+      flex: none;
+      max-width: 100%;
+      width: 100%;
+    }
+    .hero-right { display: none; }
+    .hero { min-height: auto; padding-top: 80px; }
+    .search-card { max-width: 100%; }
+  }
+
+  /* ── Hero search card – Mobile (max 600px) ── */
+  @media (max-width: 600px) {
+    .hero-content {
+      padding: 0 16px;
+      padding-top: 12px;
+      padding-bottom: 40px;
+    }
+    .hero h1 {
+      font-size: clamp(28px, 9vw, 44px);
+      margin-bottom: 24px;
+    }
+    .search-card {
+      padding: 22px 18px 18px;
+      border-radius: 12px;
+    }
+    .search-tabs { width: 100%; }
+    .search-tab { flex: 1; text-align: center; padding: 9px 16px; font-size: 14px; }
+    .sf-group { padding: 8px 14px; margin-bottom: 12px; }
+    .sf-select { font-size: 14px; }
+    .sf-label { font-size: 10px; }
+    .price-label-row { align-items: center; }
+    .price-label-row span { font-size: 14px; }
+    .currency-selector { gap: 3px; }
+    .currency-btn { padding: 3px 8px; font-size: 10px; }
+    .price-values .price-val { font-size: 13px; }
+    .btn-search { padding: 13px; font-size: 15px; margin-top: 16px; }
   }
 
   /* Scroll animations */
@@ -2587,6 +2640,312 @@
     if (ok) { ok.style.display = 'block'; setTimeout(function(){ ok.style.display='none'; }, 5000); }
   }
 
+</script>
+
+<!-- ── WHATSAPP FLOTANTE ── -->
+<style>
+  /* Contenedor principal */
+  .wa-float {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 12px;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  /* Burbuja de chat expandida */
+  .wa-bubble {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+    width: 300px;
+    overflow: hidden;
+    transform: scale(0.85) translateY(16px);
+    transform-origin: bottom right;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .3s ease, transform .3s ease;
+  }
+  .wa-bubble.open {
+    opacity: 1;
+    pointer-events: all;
+    transform: scale(1) translateY(0);
+  }
+
+  /* Header verde */
+  .wa-header {
+    background: #25D366;
+    padding: 16px 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: relative;
+  }
+  .wa-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .wa-avatar svg {
+    width: 26px;
+    height: 26px;
+    fill: #fff;
+  }
+  .wa-info { flex: 1; min-width: 0; }
+  .wa-name {
+    font-weight: 700;
+    font-size: 14px;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .wa-status {
+    font-size: 11px;
+    color: rgba(255,255,255,0.85);
+    margin-top: 1px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .wa-dot {
+    width: 7px;
+    height: 7px;
+    background: #fff;
+    border-radius: 50%;
+    animation: waPulse 2s infinite;
+    flex-shrink: 0;
+  }
+  @keyframes waPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+  .wa-close {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.8);
+    font-size: 20px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 2px 4px;
+    border-radius: 4px;
+    transition: color .2s;
+  }
+  .wa-close:hover { color: #fff; }
+
+  /* Cuerpo del chat */
+  .wa-body {
+    background: #ECE5DD;
+    padding: 18px 14px;
+    min-height: 110px;
+    display: flex;
+    align-items: flex-start;
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c5b9ae' fill-opacity='0.18'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+
+  /* Mensaje del agente */
+  .wa-msg {
+    background: #fff;
+    border-radius: 0 10px 10px 10px;
+    padding: 10px 14px;
+    max-width: 230px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    position: relative;
+    animation: waMsgIn .4s ease;
+  }
+  @keyframes waMsgIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .wa-msg::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -8px;
+    border: 8px solid transparent;
+    border-top-color: #fff;
+    border-right-color: #fff;
+  }
+  .wa-msg-text {
+    font-size: 13.5px;
+    color: #111;
+    line-height: 1.5;
+  }
+  .wa-msg-time {
+    font-size: 10px;
+    color: #aaa;
+    text-align: right;
+    margin-top: 5px;
+  }
+
+  /* Botón de acción */
+  .wa-action {
+    padding: 14px 16px;
+    background: #fff;
+    border-top: 1px solid #f0f0f0;
+  }
+  .wa-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    width: 100%;
+    background: #25D366;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 8px;
+    padding: 11px;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: 'Poppins', sans-serif;
+    transition: background .2s, transform .2s;
+  }
+  .wa-btn:hover { background: #1ebe5d; transform: translateY(-1px); }
+  .wa-btn svg { width: 18px; height: 18px; fill: #fff; flex-shrink: 0; }
+
+  /* Botón redondo principal */
+  .wa-fab {
+    width: 60px;
+    height: 60px;
+    background: #25D366;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 24px rgba(37,211,102,0.45);
+    transition: transform .25s, box-shadow .25s;
+    position: relative;
+    flex-shrink: 0;
+  }
+  .wa-fab:hover {
+    transform: scale(1.1);
+    box-shadow: 0 10px 32px rgba(37,211,102,0.55);
+  }
+  .wa-fab svg { width: 32px; height: 32px; fill: #fff; transition: opacity .2s; }
+  .wa-fab .icon-wa  { opacity: 1; position: absolute; }
+  .wa-fab .icon-x   { opacity: 0; position: absolute; }
+  .wa-fab.open .icon-wa { opacity: 0; }
+  .wa-fab.open .icon-x  { opacity: 1; }
+
+  /* Notificación punto rojo */
+  .wa-notif {
+    position: absolute;
+    top: 2px; right: 2px;
+    width: 14px; height: 14px;
+    background: #EC0606;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    animation: waBounce 1.8s infinite;
+  }
+  @keyframes waBounce {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.25); }
+  }
+  .wa-fab.open .wa-notif { display: none; }
+
+  /* Tooltip */
+  .wa-tooltip {
+    background: #333;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 20px;
+    white-space: nowrap;
+    opacity: 0;
+    transform: translateX(8px);
+    transition: opacity .3s, transform .3s;
+    pointer-events: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    position: absolute;
+    right: 72px;
+    bottom: 16px;
+  }
+  .wa-float:not(.chatopen):hover .wa-tooltip {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  @media (max-width: 480px) {
+    .wa-float { bottom: 18px; right: 16px; }
+    .wa-bubble { width: calc(100vw - 48px); max-width: 300px; }
+    .wa-fab { width: 54px; height: 54px; }
+    .wa-fab svg { width: 28px; height: 28px; }
+  }
+</style>
+
+<div class="wa-float" id="waFloat">
+  <!-- Burbuja de chat -->
+  <div class="wa-bubble" id="waBubble">
+    <div class="wa-header">
+      <div class="wa-avatar">
+        <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.135.561 4.14 1.535 5.875L0 24l6.299-1.516A11.955 11.955 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.002-1.369l-.36-.214-3.735.979.996-3.648-.235-.374A9.818 9.818 0 1112 21.818z"/></svg>
+      </div>
+      <div class="wa-info">
+        <div class="wa-name">First Car</div>
+        <div class="wa-status"><span class="wa-dot"></span> En línea · Responde rápido</div>
+      </div>
+      <button class="wa-close" onclick="toggleWa()" aria-label="Cerrar">✕</button>
+    </div>
+
+    <div class="wa-body">
+      <div class="wa-msg">
+        <div class="wa-msg-text">¡Hola! 👋 Soy el equipo de <strong>First Car</strong>. ¿En qué vehículo estás interesado? Te asesoramos al instante.</div>
+        <div class="wa-msg-time">Ahora</div>
+      </div>
+    </div>
+
+    <div class="wa-action">
+      <a class="wa-btn"
+         href="https://wa.me/573182479949?text=Hola%2C%20quiero%20estrenar%20carro%20hoy"
+         target="_blank"
+         rel="noopener noreferrer"
+         onclick="waTrack()">
+        <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.135.561 4.14 1.535 5.875L0 24l6.299-1.516A11.955 11.955 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.002-1.369l-.36-.214-3.735.979.996-3.648-.235-.374A9.818 9.818 0 1112 21.818z"/></svg>
+        Iniciar conversación
+      </a>
+    </div>
+  </div>
+
+  <!-- Tooltip -->
+  <span class="wa-tooltip">¡Chatea con nosotros!</span>
+
+  <!-- Botón FAB -->
+  <button class="wa-fab" id="waFab" onclick="toggleWa()" aria-label="Abrir WhatsApp">
+    <span class="wa-notif"></span>
+    <!-- Icono WhatsApp -->
+    <svg class="icon-wa" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.135.561 4.14 1.535 5.875L0 24l6.299-1.516A11.955 11.955 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.002-1.369l-.36-.214-3.735.979.996-3.648-.235-.374A9.818 9.818 0 1112 21.818z"/></svg>
+    <!-- Icono X (cerrar) -->
+    <svg class="icon-x" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+  </button>
+</div>
+
+<script>
+  function toggleWa() {
+    var bubble = document.getElementById('waBubble');
+    var fab    = document.getElementById('waFab');
+    var float  = document.getElementById('waFloat');
+    var isOpen = bubble.classList.contains('open');
+    bubble.classList.toggle('open', !isOpen);
+    fab.classList.toggle('open', !isOpen);
+    float.classList.toggle('chatopen', !isOpen);
+  }
+  function waTrack() {
+    // Puedes añadir analytics aquí (ej: gtag, fbq)
+  }
 </script>
 </body>
 </html>
