@@ -2144,14 +2144,90 @@ function showToast(msg, type='info') {
   // ══════════════════════════════════════════════════
   //  LEADS
   // ══════════════════════════════════════════════════
+  function loadLeads() {
+    try { return JSON.parse(localStorage.getItem('fc_leads') || '[]'); } catch(e){ return []; }
+  }
+  function saveLeads(leads) { localStorage.setItem('fc_leads', JSON.stringify(leads)); }
+
+  function renderLeadsTable(list) {
+    var data = list !== undefined ? list : loadLeads();
+    var tbody = document.getElementById('leadsTableBody');
+    if (!tbody) return;
+
+    // Update badge
+    var all = loadLeads();
+    var badge = document.getElementById('leadsCount');
+    if (badge) badge.textContent = all.length;
+
+    if (!data.length) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text3);padding:40px">No hay leads aún</td></tr>';
+      return;
+    }
+    var estadoColors = { nuevo:'badge-red', contactado:'badge-amber', cerrado:'badge-green' };
+    tbody.innerHTML = data.map(function(l) {
+      var col = estadoColors[l.estado] || 'badge-blue';
+      return '<tr>'
+        + '<td><strong>' + (l.nombre||'—') + '</strong><div style="font-size:11px;color:var(--text3)">' + (l.hora||'') + '</div></td>'
+        + '<td>' + (l.email||'—') + '</td>'
+        + '<td>' + (l.tel||'—') + '</td>'
+        + '<td style="max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + (l.asunto||'—') + '</td>'
+        + '<td style="color:var(--text2)">' + (l.fecha||'—') + '</td>'
+        + '<td><select class="form-select" style="padding:4px 8px;font-size:12px" onchange="changeLeadStatus(\'' + l.id + '\',this.value)">'
+          + ['nuevo','contactado','cerrado'].map(function(s){ return '<option value="'+s+'"'+(l.estado===s?' selected':'')+'>'+s.charAt(0).toUpperCase()+s.slice(1)+'</option>'; }).join('')
+        + '</select></td>'
+        + '<td><button class="btn btn-danger btn-sm btn-icon" onclick="deleteLead(\'' + l.id + '\')" title="Eliminar">🗑️</button></td>'
+        + '</tr>';
+    }).join('');
+  }
+
+  function filterLeads() {
+    var q = document.getElementById('leadsSearch').value.toLowerCase();
+    var estado = document.getElementById('filterLeadEstado').value;
+    var all = loadLeads();
+    var filtered = all.filter(function(l){
+      var matchQ = !q || (l.nombre||'').toLowerCase().includes(q) || (l.email||'').toLowerCase().includes(q) || (l.tel||'').includes(q);
+      var matchE = !estado || l.estado === estado;
+      return matchQ && matchE;
+    });
+    renderLeadsTable(filtered);
+  }
+
+  function changeLeadStatus(id, newStatus) {
+    var leads = loadLeads();
+    var idx = leads.findIndex(function(l){ return l.id === id; });
+    if (idx !== -1) { leads[idx].estado = newStatus; saveLeads(leads); }
+    showToast('Estado actualizado', 'success');
+  }
+
+  function deleteLead(id) {
+    if (!confirm('¿Eliminar este lead?')) return;
+    var leads = loadLeads().filter(function(l){ return l.id !== id; });
+    saveLeads(leads);
+    renderLeadsTable();
+    showToast('Lead eliminado', 'error');
+  }
+
+  function clearAllLeads() {
+    if (!confirm('¿Eliminar TODOS los leads? Esta acción no se puede deshacer.')) return;
+    localStorage.removeItem('fc_leads');
+    renderLeadsTable();
+    showToast('Todos los leads eliminados', 'error');
+  }
+
+  // Listen for new leads from the site
+  window.addEventListener('storage', function(e) {
+    if (e.key === 'fc_leads') renderLeadsTable();
+  });
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
   const supabaseClient = window.supabase.createClient(
     "https://uiyaknuovssiglkhnccd.supabase.co",
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVpeWFrbnVvdnNzaWdsa2huY2NkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0MTE5NTYsImV4cCI6MjA4OTk4Nzk1Nn0.HvbVToEEpRqEjVu43sKhb2j0R_5t8ySAfRXmWY1Cq_Y"
   );
-
-  let allLeads = [];
 
   async function cargarLeads() {
     const { data, error } = await supabaseClient
@@ -2164,74 +2240,43 @@ function showToast(msg, type='info') {
       return;
     }
 
-    allLeads = data || [];
-    renderLeadsTable(allLeads);
+    renderLeads(data || []);
   }
 
-  function renderLeadsTable(list = allLeads) {
+  function renderLeads(leads) {
     const tbody = document.getElementById("leadsTableBody");
     if (!tbody) return;
 
-    const badge = document.getElementById("leadsCount");
-    if (badge) badge.textContent = allLeads.length;
-
-    if (!list.length) {
-      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text3);padding:40px">No hay leads aún</td></tr>';
+    if (!leads.length) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="7" style="text-align:center;color:var(--text3);padding:40px">
+            No hay leads aún
+          </td>
+        </tr>
+      `;
       return;
     }
 
-    tbody.innerHTML = list.map(function(l) {
-      const estado = l.estado || 'nuevo';
+    tbody.innerHTML = "";
 
-      return '<tr>'
-        + '<td><strong>' + (l.nombre || '—') + '</strong></td>'
-        + '<td>' + (l.email || '—') + '</td>'
-        + '<td>' + (l.telefono || '—') + '</td>'
-        + '<td style="max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + (l.asunto || '—') + '</td>'
-        + '<td style="color:var(--text2)">' + (l.created_at ? new Date(l.created_at).toLocaleString() : '—') + '</td>'
-        + '<td>' + estado + '</td>'
-        + '<td>-</td>'
-        + '</tr>';
-    }).join('');
-  }
-
-  function filterLeads() {
-    const q = document.getElementById('leadsSearch').value.toLowerCase();
-    const estado = document.getElementById('filterLeadEstado').value;
-
-    const filtered = allLeads.filter(function(l) {
-      const matchQ =
-        !q ||
-        (l.nombre || '').toLowerCase().includes(q) ||
-        (l.email || '').toLowerCase().includes(q) ||
-        (l.telefono || '').includes(q);
-
-      const matchE = !estado || (l.estado || 'nuevo') === estado;
-      return matchQ && matchE;
+    leads.forEach((lead) => {
+      const row = `
+        <tr>
+          <td>${lead.nombre || ""}</td>
+          <td>${lead.email || ""}</td>
+          <td>${lead.telefono || ""}</td>
+          <td>-</td>
+          <td>${lead.created_at ? new Date(lead.created_at).toLocaleString() : ""}</td>
+          <td>Nuevo</td>
+          <td>-</td>
+        </tr>
+      `;
+      tbody.innerHTML += row;
     });
-
-    renderLeadsTable(filtered);
   }
 
-  async function clearAllLeads() {
-    if (!confirm('¿Eliminar TODOS los leads? Esta acción no se puede deshacer.')) return;
-
-    const { error } = await supabaseClient
-      .from("leads")
-      .delete()
-      .neq("id", 0);
-
-    if (error) {
-      console.error("Error eliminando leads:", error);
-      return;
-    }
-
-    await cargarLeads();
-  }
-
-  document.addEventListener("DOMContentLoaded", function () {
-    cargarLeads();
-  });
+  document.addEventListener("DOMContentLoaded", cargarLeads);
 </script>
   
 </body>
