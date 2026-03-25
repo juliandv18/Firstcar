@@ -2222,53 +2222,61 @@ function showToast(msg, type='info') {
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const supabaseClient = window.supabase.createClient(
-  "https://uiyaknuovssiglkhnccd.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVpeWFrbnVvdnNzaWdsa2huY2NkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0MTE5NTYsImV4cCI6MjA4OTk4Nzk1Nn0.HvbVToEEpRqEjVu43sKhb2j0R_5t8ySAfRXmWY1Cq_Y"
-);
-</script>
-  <script>
-async function cargarLeads() {
-  const { data, error } = await supabaseClient
-    .from("leads")
-    .select("*")
-    .order("created_at", { ascending: false });
+  const supabaseClient = window.supabase.createClient(
+    "https://uiyaknuovssiglkhnccd.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVpeWFrbnVvdnNzaWdsa2huY2NkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0MTE5NTYsImV4cCI6MjA4OTk4Nzk1Nn0.HvbVToEEpRqEjVu43sKhb2j0R_5t8ySAfRXmWY1Cq_Y"
+  );
 
-  if (error) {
-    console.error("Error cargando leads:", error);
-    return;
+  async function cargarLeads() {
+    const { data, error } = await supabaseClient
+      .from("leads")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Error cargando leads:", error);
+      return;
+    }
+
+    renderLeads(data || []);
   }
 
-  console.log("Leads:", data);
+  function renderLeads(leads) {
+    const tbody = document.getElementById("leadsTableBody");
+    if (!tbody) return;
 
-  renderLeads(data);
-}
-</script>
-  <script>
-function renderLeads(leads) {
-  const tbody = document.querySelector("table tbody");
+    if (!leads.length) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="7" style="text-align:center;color:var(--text3);padding:40px">
+            No hay leads aún
+          </td>
+        </tr>
+      `;
+      return;
+    }
 
-  tbody.innerHTML = "";
+    tbody.innerHTML = "";
 
-  leads.forEach(lead => {
-    const row = `
-      <tr>
-        <td>${lead.nombre}</td>
-        <td>${lead.email}</td>
-        <td>${lead.telefono}</td>
-        <td>-</td>
-        <td>${new Date(lead.created_at).toLocaleString()}</td>
-        <td>Nuevo</td>
-        <td>-</td>
-      </tr>
-    `;
-    tbody.innerHTML += row;
-  });
-}
-</script>
-  <script>
-document.addEventListener("DOMContentLoaded", cargarLeads);
+    leads.forEach((lead) => {
+      const row = `
+        <tr>
+          <td>${lead.nombre || ""}</td>
+          <td>${lead.email || ""}</td>
+          <td>${lead.telefono || ""}</td>
+          <td>-</td>
+          <td>${lead.created_at ? new Date(lead.created_at).toLocaleString() : ""}</td>
+          <td>Nuevo</td>
+          <td>-</td>
+        </tr>
+      `;
+      tbody.innerHTML += row;
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", cargarLeads);
 </script>
   
 </body>
