@@ -222,9 +222,13 @@ body {
 .user-role { font-size: 11px; color: var(--text3); margin-top: 1px; }
 .btn-logout {
   background: none; border: none; cursor: pointer;
-  color: var(--text3); transition: color .2s; padding: 4px;
+  color: var(--text2); transition: all .2s; padding: 6px 10px;
+  border-radius: 8px; display: flex; align-items: center; gap: 6px;
+  font-size: 12px; font-weight: 600; letter-spacing: .4px;
 }
-.btn-logout:hover { color: var(--red); }
+.btn-logout:hover { color: var(--red); background: rgba(236,6,6,.08); }
+.btn-logout .logout-label { display: none; }
+@media (min-width: 769px) { .btn-logout .logout-label { display: inline; } }
 
 /* MAIN */
 .main {
@@ -569,14 +573,107 @@ tr:hover td { background: rgba(255,255,255,.02); }
 /* ══════════════════════════════════════
    RESPONSIVE
 ══════════════════════════════════════ */
-@media (max-width: 1100px) { .stats-grid { grid-template-columns: repeat(2,1fr); } }
+/* ── Hamburger button ── */
+.hamburger {
+  display: none;
+  flex-direction: column; justify-content: center; align-items: center;
+  width: 40px; height: 40px; cursor: pointer;
+  border: none; background: transparent; padding: 6px; border-radius: 8px;
+  gap: 5px; flex-shrink: 0;
+}
+.hamburger span {
+  display: block; width: 22px; height: 2px;
+  background: var(--text); border-radius: 2px;
+  transition: transform .3s, opacity .3s;
+}
+.hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* ── Sidebar overlay ── */
+.sidebar-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,.55); z-index: 98; backdrop-filter: blur(2px);
+}
+.sidebar-overlay.active { display: block; }
+
+/* ── Responsive tables ── */
+.table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+@media (max-width: 1100px) {
+  .stats-grid { grid-template-columns: repeat(2,1fr); }
+}
+
+@media (max-width: 900px) {
+  .leads-filters { flex-wrap: wrap; gap: 8px; }
+  .leads-filters input,
+  .leads-filters select { flex: 1 1 140px; min-width: 120px; }
+  .leads-filters button { flex: 0 0 auto; }
+}
+
 @media (max-width: 768px) {
-  .sidebar { transform: translateX(-100%); }
-  .sidebar.open { transform: none; }
+  /* Sidebar deslizante */
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform .28s cubic-bezier(.4,0,.2,1);
+    z-index: 99;
+    box-shadow: 4px 0 24px rgba(0,0,0,.4);
+  }
+  .sidebar.open { transform: translateX(0); }
+
+  /* Main sin margen */
   .main { margin-left: 0; }
-  .content { padding: 20px 16px; }
-  .form-grid { grid-template-columns: 1fr; }
-  .stats-grid { grid-template-columns: 1fr 1fr; }
+
+  /* Topbar con hamburguesa */
+  .topbar { padding: 0 16px; gap: 10px; }
+  .hamburger { display: flex; }
+  .topbar-badge { display: none; }
+  #topbarDate { font-size: 11px !important; }
+
+  /* Contenido */
+  .content { padding: 16px 12px; }
+
+  /* Stats grid 1 columna en móvil muy pequeño */
+  .stats-grid { grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+  .stat-card { padding: 16px; }
+
+  /* Formularios */
+  .form-grid { grid-template-columns: 1fr; gap: 12px; }
+
+  /* Filtros apilados */
+  .leads-filters {
+    flex-direction: column; gap: 8px;
+  }
+  .leads-filters input,
+  .leads-filters select,
+  .leads-filters button { width: 100%; }
+
+  /* Botones de acción en leads */
+  .leads-header { flex-wrap: wrap; gap: 8px; }
+  .leads-header > * { flex: 1 1 auto; }
+
+  /* Tablas con scroll horizontal */
+  table { min-width: 600px; }
+  .table-wrap { margin: 0 -12px; padding: 0 12px; }
+
+  /* Modales */
+  .modal { width: 96vw; max-width: 96vw; margin: 8px; padding: 20px 16px; max-height: 92vh; }
+  .modal h2 { font-size: 18px; }
+
+  /* Import modal preview table */
+  #importPreviewTable { min-width: 500px; }
+
+  /* Fotos de vehículos */
+  .photo-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 480px) {
+  .stats-grid { grid-template-columns: 1fr; }
+  .stat-card { padding: 14px; }
+  .topbar { height: 56px; }
+  .content { padding: 12px 10px; }
+  .photo-grid { grid-template-columns: repeat(2, 1fr); }
+  .page-title { font-size: 15px; }
 }
 
 /* ── Brand logos inline ── */
@@ -686,7 +783,7 @@ tr:hover td { background: rgba(255,255,255,.02); }
         </div>
 
         <div class="nav-section-label">Catálogo</div>
-        <div class="nav-item" onclick="showPanel('vehicles',this)">
+        <div class="nav-item" id="navVehicles" onclick="showPanel('vehicles',this)">
           <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v5"/><path d="M14 17H9"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>
           Vehículos
           <span class="nav-badge" id="vehicleCount">0</span>
@@ -731,13 +828,20 @@ tr:hover td { background: rgba(255,255,255,.02); }
         </div>
         <button class="btn-logout" onclick="doLogout()" title="Cerrar sesión">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          <span class="logout-label">Salir</span>
         </button>
       </div>
     </aside>
 
+    <!-- Overlay para cerrar sidebar en móvil -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
     <!-- MAIN CONTENT -->
     <main class="main">
       <header class="topbar">
+        <button class="hamburger" id="hamburgerBtn" aria-label="Menú">
+          <span></span><span></span><span></span>
+        </button>
         <div class="page-title" id="pageTitle">Resumen</div>
         <div class="topbar-right">
           <div class="topbar-badge">● EN LÍNEA</div>
@@ -803,19 +907,19 @@ tr:hover td { background: rgba(255,255,255,.02); }
                   <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px">
                     <span>Disponibles</span><span class="badge badge-green" id="stat-avail">0</span>
                   </div>
-                  <div class="progress-bar"><div class="progress-fill" style="width:75%;background:var(--green)"></div></div>
+                  <div class="progress-bar"><div class="progress-fill" id="bar-avail" style="width:0%;background:var(--green)"></div></div>
                 </div>
                 <div style="margin-bottom:14px">
                   <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px">
                     <span>Reservados</span><span class="badge badge-amber" id="stat-reserved">0</span>
                   </div>
-                  <div class="progress-bar"><div class="progress-fill" style="width:15%;background:var(--amber)"></div></div>
+                  <div class="progress-bar"><div class="progress-fill" id="bar-reserved" style="width:0%;background:var(--amber)"></div></div>
                 </div>
                 <div>
                   <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px">
                     <span>Vendidos</span><span class="badge badge-blue" id="stat-sold">0</span>
                   </div>
-                  <div class="progress-bar"><div class="progress-fill" style="width:10%;background:var(--blue)"></div></div>
+                  <div class="progress-bar"><div class="progress-fill" id="bar-sold" style="width:0%;background:var(--blue)"></div></div>
                 </div>
               </div>
             </div>
@@ -824,9 +928,10 @@ tr:hover td { background: rgba(255,255,255,.02); }
           <div class="card" style="margin-top:20px">
             <div class="card-header">
               <div class="card-title">Últimos vehículos agregados</div>
-              <button class="btn btn-ghost btn-sm" onclick="showPanel('vehicles', document.querySelector('[onclick*=vehicles]'))">Ver todos</button>
+              <button class="btn btn-ghost btn-sm" onclick="showPanel('vehicles', document.getElementById('navVehicles'))">Ver todos</button>
             </div>
             <div class="card-body">
+              <div class="table-wrap">
               <table>
                 <thead><tr>
                   <th>Vehículo</th><th>Precio</th><th>Estado</th><th>Tipo</th><th>Fecha</th>
@@ -835,6 +940,7 @@ tr:hover td { background: rgba(255,255,255,.02); }
                   <tr><td colspan="5" style="text-align:center;color:var(--text3);padding:32px">Sin vehículos aún</td></tr>
                 </tbody>
               </table>
+              </div>
             </div>
           </div>
         </div>
@@ -860,6 +966,7 @@ tr:hover td { background: rgba(255,255,255,.02); }
           </div>
           <div class="card">
             <div class="card-body">
+              <div class="table-wrap">
               <table>
                 <thead><tr>
                   <th>Vehículo</th><th>Precio</th><th>Km</th><th>Año</th><th>Tipo</th><th>Estado</th><th>Acciones</th>
@@ -870,6 +977,7 @@ tr:hover td { background: rgba(255,255,255,.02); }
                   </td></tr>
                 </tbody>
               </table>
+              </div>
             </div>
           </div>
         </div>
@@ -1118,6 +1226,7 @@ tr:hover td { background: rgba(255,255,255,.02); }
               <div style="font-size:12px;color:var(--text3)" id="leadsLastSync">—</div>
             </div>
             <div class="card-body">
+              <div class="table-wrap">
               <table>
                 <thead><tr>
                   <th>Nombre</th>
@@ -1133,6 +1242,7 @@ tr:hover td { background: rgba(255,255,255,.02); }
                   </td></tr>
                 </tbody>
               </table>
+              </div>
             </div>
           </div>
         </div>
@@ -2009,6 +2119,12 @@ function doLogin() {
     return;
   }
   currentUser = found;
+  // Persistir sesión en localStorage (sobrevive a recargas de página)
+  localStorage.setItem('fc_session', JSON.stringify({ username: found.username }));
+  mostrarDashboard();
+}
+
+function mostrarDashboard() {
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('dashboard').style.display   = 'block';
   initDashboard();
@@ -2019,7 +2135,10 @@ document.addEventListener('keydown', e => {
 });
 
 function doLogout() {
+  // Confirmación antes de cerrar sesión
+  if (!confirm('¿Seguro que deseas cerrar sesión?')) return;
   currentUser = null;
+  localStorage.removeItem('fc_session');
   document.getElementById('dashboard').style.display   = 'none';
   document.getElementById('loginScreen').style.display = 'flex';
   document.getElementById('loginUser').value = '';
@@ -2078,7 +2197,32 @@ function showPanel(id, navEl) {
     document.getElementById('uploadFormTitle').textContent = 'Agregar nuevo vehículo';
     clearForm();
   }
+  // Cerrar sidebar en móvil al navegar
+  closeSidebar();
 }
+
+// ── Hamburger / sidebar móvil ──
+function openSidebar() {
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('hamburgerBtn').classList.add('open');
+  document.getElementById('sidebarOverlay').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('hamburgerBtn').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('active');
+  document.body.style.overflow = '';
+}
+document.addEventListener('DOMContentLoaded', function() {
+  var btn = document.getElementById('hamburgerBtn');
+  if (btn) btn.addEventListener('click', function() {
+    if (document.getElementById('sidebar').classList.contains('open')) closeSidebar();
+    else openSidebar();
+  });
+  var overlay = document.getElementById('sidebarOverlay');
+  if (overlay) overlay.addEventListener('click', closeSidebar);
+});
 
 // ════════════════════════════════════════════════════
 //  VEHICLES (localStorage — sin cambios)
@@ -2135,7 +2279,7 @@ function saveVehicle() {
   updateStats();
   renderVehicleTable();
   clearForm();
-  showPanel('vehicles', document.querySelector('[onclick*="vehicles"]'));
+  showPanel('vehicles', document.getElementById('navVehicles'));
 }
 
 function editVehicle(id) {
@@ -2247,26 +2391,53 @@ function updateStats() {
   const avail  = vehicles.filter(v => v.estado === 'disponible').length;
   const res    = vehicles.filter(v => v.estado === 'reservado').length;
   const sold   = vehicles.filter(v => v.estado === 'vendido').length;
-  document.getElementById('stat-active').textContent   = total;
-  document.getElementById('vehicleCount').textContent  = total;
-  document.getElementById('stat-avail').textContent    = avail;
-  document.getElementById('stat-reserved').textContent = res;
-  document.getElementById('stat-sold').textContent     = sold;
 
-  const recent = vehicles.slice(0,5);
-  const tbody  = document.getElementById('recentVehicles');
-  if (!recent.length) {
-    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--text3);padding:32px">Sin vehículos aún</td></tr>`;
+  // Contadores
+  const elActive   = document.getElementById('stat-active');
+  const elCount    = document.getElementById('vehicleCount');
+  const elAvail    = document.getElementById('stat-avail');
+  const elReserved = document.getElementById('stat-reserved');
+  const elSold     = document.getElementById('stat-sold');
+  if (elActive)   elActive.textContent   = total;
+  if (elCount)    elCount.textContent    = total;
+  if (elAvail)    elAvail.textContent    = avail;
+  if (elReserved) elReserved.textContent = res;
+  if (elSold)     elSold.textContent     = sold;
+
+  // Barras de progreso dinámicas
+  const barAvail    = document.getElementById('bar-avail');
+  const barReserved = document.getElementById('bar-reserved');
+  const barSold     = document.getElementById('bar-sold');
+  if (total > 0) {
+    if (barAvail)    barAvail.style.width    = Math.round(avail / total * 100) + '%';
+    if (barReserved) barReserved.style.width = Math.round(res   / total * 100) + '%';
+    if (barSold)     barSold.style.width     = Math.round(sold  / total * 100) + '%';
   } else {
-    tbody.innerHTML = recent.map(v => `
-      <tr>
-        <td>${brandLogoHTML(v.marca)} ${v.modelo} ${v.anio}</td>
-        <td>$${v.precio}</td>
-        <td><span class="badge ${v.estado==='disponible'?'badge-green':v.estado==='reservado'?'badge-amber':'badge-blue'}">${v.estado}</span></td>
-        <td><span class="badge ${v.tipo==='nuevo'?'badge-green':'badge-blue'}">${v.tipo}</span></td>
-        <td style="color:var(--text2)">${v.fecha}</td>
-      </tr>`).join('');
+    if (barAvail)    barAvail.style.width    = '0%';
+    if (barReserved) barReserved.style.width = '0%';
+    if (barSold)     barSold.style.width     = '0%';
   }
+
+  // Tabla "Últimos vehículos agregados"
+  const tbody = document.getElementById('recentVehicles');
+  if (!tbody) return;
+  if (!vehicles.length) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--text3);padding:32px">Sin vehículos aún</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = vehicles.slice(0, 5).map(v => {
+    const estadoClass = v.estado === 'disponible' ? 'badge-green'
+                      : v.estado === 'reservado'  ? 'badge-amber' : 'badge-blue';
+    const tipoClass   = v.tipo   === 'nuevo'      ? 'badge-green' : 'badge-blue';
+    const precio      = v.precio ? '$' + Number(v.precio).toLocaleString('es-CO') : '—';
+    return `<tr>
+      <td>${brandLogoHTML(v.marca)} ${v.modelo || ''} ${v.anio || ''}</td>
+      <td>${precio}</td>
+      <td><span class="badge ${estadoClass}">${v.estado || '—'}</span></td>
+      <td><span class="badge ${tipoClass}">${v.tipo || '—'}</span></td>
+      <td style="color:var(--text2)">${v.fecha || '—'}</td>
+    </tr>`;
+  }).join('');
 }
 
 // ════════════════════════════════════════════════════
@@ -2511,6 +2682,23 @@ document.addEventListener('click', e => {
     document.getElementById('brandPickerDisplay')?.classList.remove('open');
   }
 });
+
+
+// ── Auto-restaurar sesión al recargar (localStorage persiste entre recargas) ──
+(function restoreSession() {
+  const saved = localStorage.getItem('fc_session');
+  if (!saved) return;
+  try {
+    const sessionData = JSON.parse(saved);
+    const found = users.find(u => u.username === sessionData.username);
+    if (!found) { localStorage.removeItem('fc_session'); return; }
+    currentUser = found;
+    mostrarDashboard();
+  } catch(e) {
+    localStorage.removeItem('fc_session');
+  }
+})();
+
 </script>
 </body>
 </html>
